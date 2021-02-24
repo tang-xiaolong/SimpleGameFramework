@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Tube
+  - Land
+  - ScorePanel
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: bg
+    uniqueID: 1758973189
+    locked: 0
+  - name: land
+    uniqueID: 3681390713
+    locked: 0
+  - name: tube
+    uniqueID: 1056811935
+    locked: 0
+  - name: bird
+    uniqueID: 4059227231
+    locked: 0
+  - name: ui
+    uniqueID: 3500193021
+    locked: 0
