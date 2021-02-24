@@ -1,0 +1,10 @@
+Library
+Logs
+obj
+Temp
+.vs
+.idea
+.csproj
+.sln
+publish
+/*.sln
