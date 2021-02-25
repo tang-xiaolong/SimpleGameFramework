@@ -6,6 +6,8 @@ using UnityEngine;
 public class BirdController : MonoBehaviour,IInitable
 {
     public Rigidbody2D birdRig;
+
+    private Transform _transform;
     // [SerializeField]
     private Vector2 upForce;
 
@@ -13,15 +15,12 @@ public class BirdController : MonoBehaviour,IInitable
     private bool birdIsDie = false;
     private bool willAddScore = false;
 
-    private HudManager _hudManager;
-    private GameManager _gameManager;
-
     private void Awake()
     {
+        _transform = transform;
         upForce = new Vector2(0, GlobalConfig.BIRD_UP_FORCE);
-        _hudManager = FindObjectOfType<HudManager>();
-        _gameManager = FindObjectOfType<GameManager>();
         Init();
+        birdRig.simulated = false;
     }
 
     private void Update()
@@ -41,13 +40,13 @@ public class BirdController : MonoBehaviour,IInitable
         if (birdIsDie == false && willAddScore == true)
         {
             willAddScore = false;
-            _hudManager.AddScore();
+            HudManager.Instance.AddScore();
         }
         if (willDie == true && birdIsDie == false)
         {
             birdIsDie = true;
             Debug.Log("Die");
-            _gameManager.BirdDie();
+            GameManager.Instance.BirdDie();
         }
     }
 
@@ -73,9 +72,11 @@ public class BirdController : MonoBehaviour,IInitable
 
     public void Init()
     {
-        birdRig.transform.position = Vector3.zero;
+        _transform.position = Vector3.zero;
         birdIsDie = false;
         willDie = false;
         willAddScore = false;
+        _transform.localRotation = Quaternion.identity;
+        birdRig.simulated = true;
     }
 }
