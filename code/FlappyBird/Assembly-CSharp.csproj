@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{025D65CF-84A1-DE0A-91AD-C6F0A4F9CABA}</ProjectGuid>
+    <ProjectGuid>{E3EF6E53-88BE-20EB-65C7-C65330B49779}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -70,34 +70,34 @@
      <Compile Include="Assets\Scripts\Game\TubeSpawn.cs" />
      <Compile Include="Assets\Scripts\Interfaces\IInitable.cs" />
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.UI">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.2D.Sprite.Editor">
- <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlyBird/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.TextMeshPro">
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.UI">
+ <HintPath>E:/Projects/UnityLearning/SimpleGameFramework/code/FlappyBird/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.6f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

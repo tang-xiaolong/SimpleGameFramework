@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class TubeSpawn : MonoBehaviour
+public class TubeSpawn : MonoSingleton<TubeSpawn>
 {
     public GameObject tube;
     private bool isBegin = false;
@@ -38,7 +38,7 @@ public class TubeSpawn : MonoBehaviour
     {
         _waitForSeconds = new WaitForSeconds(GlobalConfig.SPAWN_TUBE_TIME);
         spawnPositionX = Camera.main.orthographicSize * GlobalConfig.SCREEN_ASPECT + 1;
-        BeginSpawnTube();
+        // BeginSpawnTube();
     }
 
     private void Update()
