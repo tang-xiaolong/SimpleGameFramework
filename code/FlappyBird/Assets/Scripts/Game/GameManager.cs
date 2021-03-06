@@ -3,18 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoSingleton<GameManager>
+public class GameManager : MonoSingleton<GameManager>, IInitable
 {
     public void BeginGame()
     {
-        HudManager.Instance.BeginGame();
-        TubeSpawn.Instance.BeginSpawnTube();
-        FindObjectOfType<BirdController>().Init();
+        MessageManager.Instance.Send(MessageDefine.BEGIN_GAME);
     }
 
-    public void BirdDie()
+    public void Init()
     {
-        HudManager.Instance.OnBirdDie();
-        TubeSpawn.Instance.StopSpawnTube();
+        ListenMessage();
+    }
+
+    void ListenMessage()
+    {
+        MessageManager.Instance.Register(MessageDefine.ON_BEGIN_GAME_CLICK, BeginGame);
     }
 }

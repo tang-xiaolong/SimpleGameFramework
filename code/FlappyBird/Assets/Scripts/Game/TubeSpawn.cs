@@ -11,6 +11,13 @@ public class TubeSpawn : MonoSingleton<TubeSpawn>
     private WaitForSeconds _waitForSeconds;
     private float spawnPositionX;
 
+    
+    void ListenMessage()
+    {
+        MessageManager.Instance.Register(MessageDefine.BEGIN_GAME, BeginSpawnTube);
+        MessageManager.Instance.Register(MessageDefine.BIRD_DIE, StopSpawnTube);
+    }
+    
     public void BeginSpawnTube()
     {
         isBegin = true;
@@ -36,6 +43,7 @@ public class TubeSpawn : MonoSingleton<TubeSpawn>
     }
     private void Awake()
     {
+        ListenMessage();
         _waitForSeconds = new WaitForSeconds(GlobalConfig.SPAWN_TUBE_TIME);
         spawnPositionX = Camera.main.orthographicSize * GlobalConfig.SCREEN_ASPECT + 1;
         // BeginSpawnTube();
