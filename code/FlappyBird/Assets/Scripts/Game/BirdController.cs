@@ -15,11 +15,17 @@ public class BirdController : MonoBehaviour,IInitable
     private bool birdIsDie = false;
     private bool willAddScore = false;
 
+    void ListenMessage()
+    {
+        MessageManager.Instance.Register(MessageDefine.BEGIN_GAME, Init);
+    }
+    
     private void Awake()
     {
         _transform = transform;
         upForce = new Vector2(0, GlobalConfig.BIRD_UP_FORCE);
         Init();
+        ListenMessage();
         birdRig.simulated = false;
     }
 
@@ -40,13 +46,13 @@ public class BirdController : MonoBehaviour,IInitable
         if (birdIsDie == false && willAddScore == true)
         {
             willAddScore = false;
-            HudManager.Instance.AddScore();
+            MessageManager.Instance.Send(MessageDefine.ADD_SCORE);
         }
         if (willDie == true && birdIsDie == false)
         {
             birdIsDie = true;
             Debug.Log("Die");
-            GameManager.Instance.BirdDie();
+            MessageManager.Instance.Send(MessageDefine.BIRD_DIE);
         }
     }
 

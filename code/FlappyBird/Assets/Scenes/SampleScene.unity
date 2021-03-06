@@ -1658,6 +1658,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6ee108fb53781e4ca3fbee7ccbac185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  beginBtn: {fileID: 1450909905}
+  beginBtn1: {fileID: 1695861297}
   beginPanel: {fileID: 817024842}
   diePanel: {fileID: 2086395453}
   txtScore: {fileID: 56518538}
