@@ -13,3 +13,13 @@ public class MessageData<T> : IMessageData
         MessageEvents += action;
     }
 }
+
+public class MessageData : IMessageData
+{
+    public UnityAction MessageEvents;
+
+    public MessageData(UnityAction action)
+    {
+        MessageEvents += action;
+    }
+}

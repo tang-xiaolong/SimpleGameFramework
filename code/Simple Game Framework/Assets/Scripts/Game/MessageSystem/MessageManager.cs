@@ -51,6 +51,40 @@ public class MessageManager : Singleton<MessageManager>
         }
     }
 
+    public void Register(string key, UnityAction action)
+    {
+        if (dictionaryMessage.TryGetValue(key, out var previousAction))
+        {
+            if (previousAction is MessageData messageData)
+            {
+                messageData.MessageEvents += action;
+            }
+        }
+        else
+        {
+            dictionaryMessage.Add(key, new MessageData(action));
+        }
+    }
+
+    public void Remove(string key, UnityAction action)
+    {
+        if (dictionaryMessage.TryGetValue(key, out var previousAction))
+        {
+            if (previousAction is MessageData messageData)
+            {
+                messageData.MessageEvents -= action;
+            }
+        }
+    }
+
+    public void Send(string key)
+    {
+        if (dictionaryMessage.TryGetValue(key, out var previousAction))
+        {
+            (previousAction as MessageData)?.MessageEvents.Invoke();
+        }
+    }
+
     public void Clear()
     {
         dictionaryMessage.Clear();
