@@ -10,4 +10,6 @@
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
  
- [Unity游戏框架从0到1 (二) 单例模块 ](https://www.bilibili.com/video/BV1bK4y1S71K)
+ [Unity游戏框架从0到1 (二) 单例模块](https://www.bilibili.com/video/BV1bK4y1S71K)
+ 
+ [Unity游戏框架从0到1 （三）高效的全局消息系统 + Flappy实战](https://www.bilibili.com/video/BV1HK4y1U7GX)
