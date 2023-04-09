@@ -46,6 +46,8 @@ public class TubeSpawn : MonoSingleton<TubeSpawn>
         ListenMessage();
         _waitForSeconds = new WaitForSeconds(GlobalConfig.SPAWN_TUBE_TIME);
         spawnPositionX = Camera.main.orthographicSize * GlobalConfig.SCREEN_ASPECT + 1;
+        AssetsManager.Instance.AssetsLoadType = AssetsManager.AssetLoadType.Resources;
+        tube = AssetsManager.Instance.LoadAsset<GameObject>(AssetsManager.GetPrefabPath("Tube"));
         // BeginSpawnTube();
     }
 
