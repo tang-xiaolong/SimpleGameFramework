@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FutureEventModule
+namespace DelayedTaskModule
 {
     public static class TimerUtil
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FutureEventModule
+namespace DelayedTaskModule
 {
-    public class FutureEventData
+    public class DelayedTaskData
     {
         public long Time;
         public Action Action;

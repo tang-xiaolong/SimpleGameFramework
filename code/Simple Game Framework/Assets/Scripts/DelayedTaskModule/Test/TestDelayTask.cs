@@ -4,19 +4,23 @@ using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace FutureEventModule.Test
+namespace DelayedTaskModule
 {
-    public class TestFutureEvent : MonoBehaviour
+    public class TestDelayTask : MonoBehaviour
     {
         private void Start()
         {
             AddLaterExecuteFunc(1.5f);
+            AddLaterExecuteFunc(1.5f);
+            AddLaterExecuteFunc(1.5f);
+            AddLaterExecuteFunc(4.5f);
+            AddLaterExecuteFunc(4.5f);
             AddLaterExecuteFunc(4.5f);
         }
-
+        
         public int forceTestCount = 100000;
-        public List<FutureEventData> futureEventDataList = new List<FutureEventData>(100000);
-        public List<long> testTimes = new List<long>(100000);
+        List<DelayedTaskData> futureEventDataList = new List<DelayedTaskData>(100000);
+        List<long> testTimes = new List<long>(100000);
         
         [ContextMenu("暴力测试")]
         public void ForceTest()
@@ -32,12 +36,12 @@ namespace FutureEventModule.Test
             stopwatch.Start();
             for (int i = 0; i < forceTestCount; i++)
             {
-                futureEventDataList.Add(FutureEventScheduler.Instance.AddFutureEvent(testTimes[i], TestFunc));
+                futureEventDataList.Add(DelayedTaskScheduler.Instance.AddDelayedTask(testTimes[i], TestFunc));
             }
 
             for (int i = 0; i < forceTestCount; i++)
             {
-                FutureEventScheduler.Instance.RemoveFutureEvent(futureEventDataList[i]);
+                DelayedTaskScheduler.Instance.RemoveDelayedTask(futureEventDataList[i]);
             }
             
             stopwatch.Stop();
@@ -49,14 +53,16 @@ namespace FutureEventModule.Test
             Debug.Log("测试方法执行了");
         }
 
-        private FutureEventData AddLaterExecuteFunc(float time, Action completeAction = null, Action earlyRemoveAction = null)
+        private DelayedTaskData AddLaterExecuteFunc(float time, Action completeAction = null, Action earlyRemoveAction = null)
         {
+            var pressTime = Time.time;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Restart();
-            return FutureEventScheduler.Instance.AddFutureEvent(TimerUtil.GetLaterMilliSecondsBySecond(time),
+            return DelayedTaskScheduler.Instance.AddDelayedTask(TimerUtil.GetLaterMilliSecondsBySecond(time),
                 () =>
                 {
                     stopwatch.Stop();
+                    // Debug.Log($"{time}秒后了,执行了对应方法。实际过去了{Time.time - pressTime}秒");
                     Debug.Log($"{time}秒后了,执行了对应方法。实际过去了{stopwatch.ElapsedMilliseconds / 1000.0f}秒");
                     completeAction?.Invoke();
                 }, () =>
@@ -67,29 +73,29 @@ namespace FutureEventModule.Test
                 });
         }
 
-        FutureEventData _futureEventData;
+        DelayedTaskData _delayedTaskData;
 
-        void RecycleFutureEvent()
+        void RecycleDelayedTask()
         {
-            if (_futureEventData != null)
+            if (_delayedTaskData != null)
             {
-                FutureEventScheduler.Instance.RemoveFutureEvent(_futureEventData);
-                _futureEventData = null;
+                DelayedTaskScheduler.Instance.RemoveDelayedTask(_delayedTaskData);
+                _delayedTaskData = null;
             }
         }
 
         private void Update()
         {
             //持续按下时不断创建和回收
-            if (Input.GetKeyDown(KeyCode.C))
+            if (Input.GetKey(KeyCode.C))
             {
-                RecycleFutureEvent();
-                _futureEventData = AddLaterExecuteFunc(UnityEngine.Random.Range(1, 5.0f), () => _futureEventData = null);
+                RecycleDelayedTask();
+                _delayedTaskData = AddLaterExecuteFunc(UnityEngine.Random.Range(1, 5.0f), () => _delayedTaskData = null);
             }
 
             if (Input.GetKeyDown(KeyCode.R))
             {
-                RecycleFutureEvent();
+                RecycleDelayedTask();
             }
         }
     }

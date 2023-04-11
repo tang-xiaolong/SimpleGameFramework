@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using LDataStruct;
 using UnityEngine;
 
-namespace FutureEventModule
+namespace DelayedTaskModule
 {
+    /// <summary>
+    /// 延时任务调度器
+    /// </summary>
     [DefaultExecutionOrder(1)]
-    public class FutureEventScheduler : MonoBehaviour, IDisposable
+    public class DelayedTaskScheduler : MonoBehaviour, IDisposable
     {
-        private Dictionary<long, FutureEventList> _futureEventDict = new Dictionary<long, FutureEventList>();
-        private Heap<FutureEventList> _futureEventQueue = new Heap<FutureEventList>(10, HeapType.MinHeap);
+        private Dictionary<long, DelayedTaskList> _delayedTaskDict = new Dictionary<long, DelayedTaskList>();
+        private Heap<DelayedTaskList> _delayedTaskQueue = new Heap<DelayedTaskList>(10, HeapType.MinHeap);
         private bool _disposed = false;
         [SerializeField] private long CurrentTime;
-        public static FutureEventScheduler Instance { get; private set; }
+        public static DelayedTaskScheduler Instance { get; private set; }
 
         #region 时间事件管理
 
@@ -21,7 +24,7 @@ namespace FutureEventModule
         /// </summary>
         /// <param name="time">毫秒数</param>
         /// <param name="action"></param>
-        public FutureEventData AddFutureEvent(long time, Action action, Action earlyRemoveCallback = null)
+        public DelayedTaskData AddDelayedTask(long time, Action action, Action earlyRemoveCallback = null)
         {
             if (time < CurrentTime)
             {
@@ -29,48 +32,48 @@ namespace FutureEventModule
                 return null;
             }
 
-            if (!_futureEventDict.TryGetValue(time, out var futureEventList))
+            if (!_delayedTaskDict.TryGetValue(time, out var delayedTaskList))
             {
-                futureEventList = new FutureEventList();
-                futureEventList.Time = time;
-                futureEventList.FutureEventDataList = new List<FutureEventData>();
-                futureEventList.FutureEventDataList.Clear();
-                _futureEventQueue.Insert(futureEventList);
-                _futureEventDict.Add(time, futureEventList);
+                delayedTaskList = new DelayedTaskList();
+                delayedTaskList.Time = time;
+                delayedTaskList.DelayedTaskDataList = new List<DelayedTaskData>();
+                delayedTaskList.DelayedTaskDataList.Clear();
+                _delayedTaskQueue.Insert(delayedTaskList);
+                _delayedTaskDict.Add(time, delayedTaskList);
             }
 
-            var newEventData = new FutureEventData();
+            var newEventData = new DelayedTaskData();
             newEventData.Time = time;
             newEventData.Action = action;
             newEventData.EarlyRemoveCallback = earlyRemoveCallback;
-            futureEventList.FutureEventDataList.Add(newEventData);
+            delayedTaskList.DelayedTaskDataList.Add(newEventData);
             return newEventData;
         }
 
         /// <summary>
         /// 移除一个时间事件对象
         /// </summary>
-        /// <param name="futureEventData"></param>
+        /// <param name="delayedTaskData"></param>
         /// <exception cref="Exception"></exception>
-        public void RemoveFutureEvent(FutureEventData futureEventData)
+        public void RemoveDelayedTask(DelayedTaskData delayedTaskData)
         {
-            if (futureEventData == null)
+            if (delayedTaskData == null)
                 return;
-            if (_futureEventDict.TryGetValue(futureEventData.Time, out var futureEventList))
+            if (_delayedTaskDict.TryGetValue(delayedTaskData.Time, out var delayedTaskList))
             {
-                bool removeSuccess = futureEventList.FutureEventDataList.Remove(futureEventData);
+                bool removeSuccess = delayedTaskList.DelayedTaskDataList.Remove(delayedTaskData);
                 if (removeSuccess)
-                    futureEventData.EarlyRemoveCallback?.Invoke();
-                if (futureEventList.FutureEventDataList.Count == 0)
+                    delayedTaskData.EarlyRemoveCallback?.Invoke();
+                if (delayedTaskList.DelayedTaskDataList.Count == 0)
                 {
-                    _futureEventDict.Remove(futureEventData.Time);
-                    if (_futureEventQueue.Delete(futureEventList))
+                    _delayedTaskDict.Remove(delayedTaskData.Time);
+                    if (_delayedTaskQueue.Delete(delayedTaskList))
                     {
-                        futureEventList.Dispose();
+                        delayedTaskList.Dispose();
                     }
                     else
                     {
-                        throw new Exception("FutureEventScheduler RemoveFutureEvent Error");
+                        throw new Exception("DelayedTaskScheduler RemoveDelayedTask Error");
                     }
                 }
             }
@@ -83,16 +86,17 @@ namespace FutureEventModule
         public void UpdateTime(long time)
         {
             CurrentTime = time;
-            while (_futureEventQueue.Count > 0 && _futureEventQueue.GetHead().Time <= time)
+            while (_delayedTaskQueue.Count > 0 && _delayedTaskQueue.GetHead().Time <= time)
             {
-                long targetTime = _futureEventQueue.GetHead().Time;
-                _futureEventDict.Remove(targetTime);
-                var futureEventList = _futureEventQueue.DeleteHead();
-                foreach (FutureEventData futureEventData in futureEventList)
+                long targetTime = _delayedTaskQueue.GetHead().Time;
+                _delayedTaskDict.Remove(targetTime);
+                var delayedTaskList = _delayedTaskQueue.DeleteHead();
+                foreach (DelayedTaskData delayedTaskData in delayedTaskList)
                 {
-                    futureEventData.Action?.Invoke();
+                    delayedTaskData.Action?.Invoke();
                 }
-                futureEventList.Dispose();
+
+                delayedTaskList.Dispose();
             }
         }
 
@@ -132,7 +136,7 @@ namespace FutureEventModule
             {
                 if (disposing)
                 {
-                    _futureEventQueue?.Dispose();
+                    _delayedTaskQueue?.Dispose();
                     Instance = null;
                 }
 
@@ -140,7 +144,7 @@ namespace FutureEventModule
             }
         }
 
-        ~FutureEventScheduler()
+        ~DelayedTaskScheduler()
         {
             Dispose(false);
         }

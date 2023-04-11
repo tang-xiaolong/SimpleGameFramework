@@ -2,34 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace FutureEventModule
+namespace DelayedTaskModule
 {
-    public class FutureEventList : IComparable, IEnumerable<FutureEventData>, IDisposable
+    public class DelayedTaskList : IComparable, IEnumerable<DelayedTaskData>, IDisposable
     {
         private bool _disposed = false;
         public long Time;
-        public List<FutureEventData> FutureEventDataList;
+        public List<DelayedTaskData> DelayedTaskDataList;
 
         public int CompareTo(object obj)
         {
             if (obj == null)
                 return 1;
-            return CompareTo((FutureEventList)obj);
+            return CompareTo((DelayedTaskList)obj);
         }
 
-        public int CompareTo(FutureEventList obj)
+        public int CompareTo(DelayedTaskList obj)
         {
             return Time.CompareTo(obj.Time);
         }
 
-        IEnumerator<FutureEventData> IEnumerable<FutureEventData>.GetEnumerator()
+        IEnumerator<DelayedTaskData> IEnumerable<DelayedTaskData>.GetEnumerator()
         {
-            return FutureEventDataList.GetEnumerator();
+            return DelayedTaskDataList.GetEnumerator();
         }
 
         public IEnumerator GetEnumerator()
         {
-            return FutureEventDataList.GetEnumerator();
+            return DelayedTaskDataList.GetEnumerator();
         }
 
         public void Dispose()
@@ -44,13 +44,13 @@ namespace FutureEventModule
                 return;
             if (disposing)
             {
-                FutureEventDataList.Clear();
-                FutureEventDataList = null;
+                DelayedTaskDataList.Clear();
+                DelayedTaskDataList = null;
             }
             _disposed = true;
         }
         
-        ~FutureEventList()
+        ~DelayedTaskList()
         {
             Dispose(false);
         }
