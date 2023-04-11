@@ -58,12 +58,12 @@ namespace FutureEventModule
                 return;
             if (_futureEventDict.TryGetValue(futureEventData.Time, out var futureEventList))
             {
-                _futureEventDict.Remove(futureEventData.Time);
                 bool removeSuccess = futureEventList.FutureEventDataList.Remove(futureEventData);
                 if (removeSuccess)
                     futureEventData.EarlyRemoveCallback?.Invoke();
                 if (futureEventList.FutureEventDataList.Count == 0)
                 {
+                    _futureEventDict.Remove(futureEventData.Time);
                     if (_futureEventQueue.Delete(futureEventList))
                     {
                         futureEventList.Dispose();
@@ -72,10 +72,6 @@ namespace FutureEventModule
                     {
                         throw new Exception("FutureEventScheduler RemoveFutureEvent Error");
                     }
-                }
-                else
-                {
-                    Debug.LogError("移除后数量不为0 removeSuccess is " + removeSuccess);
                 }
             }
         }
