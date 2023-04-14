@@ -7,9 +7,15 @@
 
 [Unity基础框架从0到1（三）高效的全局消息系统](https://mp.weixin.qq.com/s?__biz=MzAwMjg1ODk4Ng==&mid=2651066323&idx=1&sn=baf2f2a30efec8f88fc20c560b80343e&chksm=8134a556b6432c40e06b79e670930ef8a8fb16862bcdbd25201c3eca2476176e68aa755334ef&token=1373914223&lang=zh_CN#rd)
 
+[Unity基础框架从0到1（四）资源加载与管理模块](https://mp.weixin.qq.com/s/6lVAhIckRgG7LXaw6RviqQ)
+
+[Unity基础框架从0到1（五）延时任务调度模块](https://mp.weixin.qq.com/s/t1GZZ0ImCiegFhIF4a33oQ)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
- 
+
  [Unity游戏框架从0到1 (二) 单例模块](https://www.bilibili.com/video/BV1bK4y1S71K)
- 
+
  [Unity游戏框架从0到1 （三）高效的全局消息系统 + Flappy实战](https://www.bilibili.com/video/BV1HK4y1U7GX)
+
+[Unity游戏框架从0到1 (四)资源加载模块](https://www.bilibili.com/video/BV1zm4y1B75T/)
