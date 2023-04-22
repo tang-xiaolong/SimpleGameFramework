@@ -19,3 +19,5 @@
  [Unity游戏框架从0到1 （三）高效的全局消息系统 + Flappy实战](https://www.bilibili.com/video/BV1HK4y1U7GX)
 
 [Unity游戏框架从0到1 (四)资源加载模块](https://www.bilibili.com/video/BV1zm4y1B75T/)
+
+[Unity游戏框架从0到1 (五)延时任务调度模块](https://www.bilibili.com/video/BV15L411Y76M/?)
