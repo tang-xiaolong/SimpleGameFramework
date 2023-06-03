@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LDataStruct;
+using PoolModule;
 using UnityEngine;
 
 namespace DelayedTaskModule
@@ -11,6 +12,7 @@ namespace DelayedTaskModule
     [DefaultExecutionOrder(1)]
     public class DelayedTaskScheduler : MonoBehaviour, IDisposable
     {
+        private Dictionary<string, DelayedTaskData> _taskDic = new Dictionary<string, DelayedTaskData>();
         private Dictionary<long, DelayedTaskList> _delayedTaskDict = new Dictionary<long, DelayedTaskList>();
         private Heap<DelayedTaskList> _delayedTaskQueue = new Heap<DelayedTaskList>(10, HeapType.MinHeap);
         private bool _disposed = false;
@@ -24,7 +26,7 @@ namespace DelayedTaskModule
         /// </summary>
         /// <param name="time">毫秒数</param>
         /// <param name="action"></param>
-        public DelayedTaskData AddDelayedTask(long time, Action action, Action earlyRemoveCallback = null)
+        public string AddDelayedTask(long time, Action action, Action earlyRemoveCallback = null)
         {
             if (time < CurrentTime)
             {
@@ -34,20 +36,23 @@ namespace DelayedTaskModule
 
             if (!_delayedTaskDict.TryGetValue(time, out var delayedTaskList))
             {
-                delayedTaskList = new DelayedTaskList();
+                delayedTaskList = ObjectPoolFactory.Instance.GetItem<DelayedTaskList>();
                 delayedTaskList.Time = time;
-                delayedTaskList.DelayedTaskDataList = new List<DelayedTaskData>();
+                delayedTaskList.DelayedTaskDataList = ObjectPoolFactory.Instance.GetItem<List<DelayedTaskData>>();
                 delayedTaskList.DelayedTaskDataList.Clear();
                 _delayedTaskQueue.Insert(delayedTaskList);
                 _delayedTaskDict.Add(time, delayedTaskList);
             }
 
-            var newEventData = new DelayedTaskData();
-            newEventData.Time = time;
-            newEventData.Action = action;
-            newEventData.EarlyRemoveCallback = earlyRemoveCallback;
-            delayedTaskList.DelayedTaskDataList.Add(newEventData);
-            return newEventData;
+            string token = Guid.NewGuid().ToString();
+            var delayedTaskData = ObjectPoolFactory.Instance.GetItem<DelayedTaskData>();
+            delayedTaskData.Time = time;
+            delayedTaskData.Action = action;
+            delayedTaskData.Token = token;
+            delayedTaskData.EarlyRemoveCallback = earlyRemoveCallback;
+            delayedTaskList.DelayedTaskDataList.Add(delayedTaskData);
+            _taskDic.Add(token, delayedTaskData);
+            return token;
         }
 
         /// <summary>
@@ -55,10 +60,12 @@ namespace DelayedTaskModule
         /// </summary>
         /// <param name="delayedTaskData"></param>
         /// <exception cref="Exception"></exception>
-        public void RemoveDelayedTask(DelayedTaskData delayedTaskData)
+        public bool RemoveDelayedTask(string token)
         {
+            _taskDic.TryGetValue(token, out var delayedTaskData);
             if (delayedTaskData == null)
-                return;
+                return false;
+            _taskDic.Remove(token);
             if (_delayedTaskDict.TryGetValue(delayedTaskData.Time, out var delayedTaskList))
             {
                 bool removeSuccess = delayedTaskList.DelayedTaskDataList.Remove(delayedTaskData);
@@ -69,14 +76,23 @@ namespace DelayedTaskModule
                     _delayedTaskDict.Remove(delayedTaskData.Time);
                     if (_delayedTaskQueue.Delete(delayedTaskList))
                     {
-                        delayedTaskList.Dispose();
+                        ObjectPoolFactory.Instance.RecycleItem(delayedTaskList.DelayedTaskDataList);
+                        ObjectPoolFactory.Instance.RecycleItem(delayedTaskList);
+                        ObjectPoolFactory.Instance.RecycleItem(delayedTaskData);
                     }
                     else
                     {
+                        ObjectPoolFactory.Instance.RecycleItem(delayedTaskData);
                         throw new Exception("DelayedTaskScheduler RemoveDelayedTask Error");
                     }
                 }
             }
+            else
+            {
+                ObjectPoolFactory.Instance.RecycleItem(delayedTaskData);
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -94,9 +110,14 @@ namespace DelayedTaskModule
                 foreach (DelayedTaskData delayedTaskData in delayedTaskList)
                 {
                     delayedTaskData.Action?.Invoke();
+                    _taskDic.Remove(delayedTaskData.Token);
+                    ObjectPoolFactory.Instance.RecycleItem(delayedTaskData);
                 }
 
-                delayedTaskList.Dispose();
+                //回收时记得把列表清空，防止下次使用时出现问题！！！！！不要问我为什么这么多感叹号 
+                delayedTaskList.DelayedTaskDataList.Clear();
+                ObjectPoolFactory.Instance.RecycleItem(delayedTaskList.DelayedTaskDataList);
+                ObjectPoolFactory.Instance.RecycleItem(delayedTaskList);
             }
         }
 
@@ -136,6 +157,8 @@ namespace DelayedTaskModule
             {
                 if (disposing)
                 {
+                    _taskDic.Clear();
+                    _delayedTaskDict.Clear();
                     _delayedTaskQueue?.Dispose();
                     Instance = null;
                 }

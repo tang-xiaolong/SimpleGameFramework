@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using JetBrains.Annotations;
+using PoolModule;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -19,7 +21,7 @@ namespace DelayedTaskModule
         }
         
         public int forceTestCount = 100000;
-        List<DelayedTaskData> futureEventDataList = new List<DelayedTaskData>(100000);
+        List<string> futureEventDataList = new List<string>(100000);
         List<long> testTimes = new List<long>(100000);
         
         [ContextMenu("暴力测试")]
@@ -53,15 +55,16 @@ namespace DelayedTaskModule
             Debug.Log("测试方法执行了");
         }
 
-        private DelayedTaskData AddLaterExecuteFunc(float time, Action completeAction = null, Action earlyRemoveAction = null)
+        private string AddLaterExecuteFunc(float time, Action completeAction = null, Action earlyRemoveAction = null)
         {
             var pressTime = Time.time;
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = ObjectPoolFactory.Instance.GetItem<Stopwatch>();
             stopwatch.Restart();
             return DelayedTaskScheduler.Instance.AddDelayedTask(TimerUtil.GetLaterMilliSecondsBySecond(time),
                 () =>
                 {
                     stopwatch.Stop();
+                    ObjectPoolFactory.Instance.RecycleItem(stopwatch);
                     // Debug.Log($"{time}秒后了,执行了对应方法。实际过去了{Time.time - pressTime}秒");
                     Debug.Log($"{time}秒后了,执行了对应方法。实际过去了{stopwatch.ElapsedMilliseconds / 1000.0f}秒");
                     completeAction?.Invoke();
@@ -70,17 +73,18 @@ namespace DelayedTaskModule
                     earlyRemoveAction?.Invoke();
                     stopwatch.Stop();
                     Debug.Log($"提前移除了，已经过去了{stopwatch.ElapsedMilliseconds / 1000.0f}秒");
+                    ObjectPoolFactory.Instance.RecycleItem(stopwatch);
                 });
         }
 
-        DelayedTaskData _delayedTaskData;
+        [CanBeNull] string _delayedTaskDataToken;
 
         void RecycleDelayedTask()
         {
-            if (_delayedTaskData != null)
+            if (_delayedTaskDataToken != null)
             {
-                DelayedTaskScheduler.Instance.RemoveDelayedTask(_delayedTaskData);
-                _delayedTaskData = null;
+                DelayedTaskScheduler.Instance.RemoveDelayedTask(_delayedTaskDataToken);
+                _delayedTaskDataToken = null;
             }
         }
 
@@ -90,7 +94,7 @@ namespace DelayedTaskModule
             if (Input.GetKey(KeyCode.C))
             {
                 RecycleDelayedTask();
-                _delayedTaskData = AddLaterExecuteFunc(UnityEngine.Random.Range(1, 5.0f), () => _delayedTaskData = null);
+                _delayedTaskDataToken = AddLaterExecuteFunc(UnityEngine.Random.Range(1, 5.0f), () => _delayedTaskDataToken = null);
             }
 
             if (Input.GetKeyDown(KeyCode.R))
