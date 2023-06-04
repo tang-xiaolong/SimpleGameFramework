@@ -77,7 +77,6 @@ namespace PoolModule
             _curCount++;
             _enterQueueHandle?.Invoke(newObject);
             EnqueueHandle(newObject);
-            _objects.Enqueue(newObject);
             return newObject;
         }
 
