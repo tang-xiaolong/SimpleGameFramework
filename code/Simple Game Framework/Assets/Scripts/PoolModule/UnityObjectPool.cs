@@ -48,7 +48,6 @@ namespace PoolModule
             if (item is GameObject obj)
                 obj.SetActive(true);
             _dequeueHandle?.Invoke(item);
-            DequeueHandle(item);
             return item;
         }
 
@@ -75,6 +74,7 @@ namespace PoolModule
             if (newObject is GameObject obj)
                 obj.SetActive(false);
             _curCount++;
+            Debug.Log($"CurCount = {_curCount}");
             _enterQueueHandle?.Invoke(newObject);
             EnqueueHandle(newObject);
             return newObject;

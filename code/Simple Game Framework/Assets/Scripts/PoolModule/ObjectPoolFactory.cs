@@ -30,7 +30,7 @@ namespace PoolModule
             _disposed = false;
         }
 
-        public ObjectPool<T> GetPool<T>(Func<T> objectGenerator = null, int poolSize = DefaultPoolSize) where T : new()
+        private ObjectPool<T> GetPool<T>(Func<T> objectGenerator = null, int poolSize = DefaultPoolSize) where T : new()
         {
             var type = typeof(T);
             if (!_pools.TryGetValue(type, out var pool))
