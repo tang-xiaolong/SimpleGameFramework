@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace PoolModule
@@ -51,10 +50,6 @@ namespace PoolModule
         public void RecycleItem<T>(T item) where T : new()
         {
             GetPool<T>().Recycle(item);
-            if(item is IList list)
-                list.Clear();
-            else if(item is IDictionary dictionary)
-                dictionary.Clear();
         }
 
         public void Dispose()

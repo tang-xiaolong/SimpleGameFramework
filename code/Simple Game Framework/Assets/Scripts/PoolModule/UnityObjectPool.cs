@@ -45,8 +45,6 @@ namespace PoolModule
             Object item = _objects.Count == 0 ? CreateObject() : _objects.Dequeue();
             if (item != null)
                 DequeueHandle(item);
-            if (item is GameObject obj)
-                obj.SetActive(true);
             _dequeueHandle?.Invoke(item);
             return item;
         }
@@ -57,8 +55,6 @@ namespace PoolModule
                 return;
             if (!_objects.Contains(item))
             {
-                if (item is GameObject obj)
-                    obj.SetActive(false);
                 _enterQueueHandle?.Invoke(item);
                 EnqueueHandle(item);
                 _objects.Enqueue(item);
@@ -71,10 +67,7 @@ namespace PoolModule
             var newObject = _objectFactory != null
                 ? _objectFactory()
                 : Object.Instantiate(ItemPrefab);
-            if (newObject is GameObject obj)
-                obj.SetActive(false);
             _curCount++;
-            Debug.Log($"CurCount = {_curCount}");
             _enterQueueHandle?.Invoke(newObject);
             EnqueueHandle(newObject);
             return newObject;
@@ -96,12 +89,16 @@ namespace PoolModule
             }
         }
 
-        public virtual void EnqueueHandle(Object item)
+        public void EnqueueHandle(Object item)
         {
+            if (item is GameObject obj)
+                obj.SetActive(false);
         }
 
-        public virtual void DequeueHandle(Object item)
+        public void DequeueHandle(Object item)
         {
+            if (item is GameObject obj)
+                obj.SetActive(true);
         }
 
         public void Dispose()

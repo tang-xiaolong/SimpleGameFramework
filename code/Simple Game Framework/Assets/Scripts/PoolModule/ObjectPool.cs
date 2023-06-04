@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace PoolModule
@@ -71,10 +72,18 @@ namespace PoolModule
 
         public void EnqueueHandle(T item)
         {
+            if(item is IPoolObjectItem iPoolItem)
+                iPoolItem.OnRecycleHandle();
+            if(item is IList list)
+                list.Clear();
+            else if(item is IDictionary dictionary)
+                dictionary.Clear();
         }
 
         public void DequeueHandle(T item)
         {
+            if(item is IPoolObjectItem iPoolItem)
+                iPoolItem.OnGetHandle();
         }
 
         public void Dispose()
