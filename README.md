@@ -11,6 +11,8 @@
 
 [Unity基础框架从0到1（五）延时任务调度模块](https://mp.weixin.qq.com/s/t1GZZ0ImCiegFhIF4a33oQ)
 
+[Unity基础框架从0到1（六）对象池模块](https://mp.weixin.qq.com/s/24-2b69-6KKXmjvJG2UaSQ)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
 
@@ -21,3 +23,5 @@
 [Unity游戏框架从0到1 (四)资源加载模块](https://www.bilibili.com/video/BV1zm4y1B75T/)
 
 [Unity游戏框架从0到1 (五)延时任务调度模块](https://www.bilibili.com/video/BV15L411Y76M/?)
+
+[Unity基础框架从0到1（六）对象池模块](https://www.bilibili.com/video/BV1rk4y1H7uq)
