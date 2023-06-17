@@ -72,6 +72,7 @@ namespace PoolModule
                 _pools.Clear();
             }
 
+            _instance = null;
             _disposed = true;
         }
 
