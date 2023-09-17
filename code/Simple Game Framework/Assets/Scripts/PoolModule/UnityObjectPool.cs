@@ -8,6 +8,19 @@ namespace PoolModule
     [Serializable]
     public class UnityObjectPool : IObjectPool<Object>, IDisposable
     {
+        private static Transform _poolRoot;
+        public static Transform PoolRoot
+        {
+            get
+            {
+                if (_poolRoot == null)
+                {
+                    _poolRoot = new GameObject("PoolRoot").transform;
+                }
+
+                return _poolRoot;
+            }
+        }
         public Object ItemPrefab;
         public int InitialPoolSize = 0;
         public readonly int MaxPoolSize = 500;
@@ -92,7 +105,10 @@ namespace PoolModule
         public void EnqueueHandle(Object item)
         {
             if (item is GameObject obj)
+            {
                 obj.SetActive(false);
+                obj.transform.SetParent(PoolRoot, true);
+            }
         }
 
         public void DequeueHandle(Object item)
