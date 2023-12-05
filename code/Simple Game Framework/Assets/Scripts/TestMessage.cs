@@ -7,6 +7,7 @@ public class TestMessage : MonoBehaviour
 
     void Start()
     {
+        PoolModule.ObjectPoolFactory.Instance.GetItem<List<int>>();
         MessageManager.Instance.Register<int>(MessageDefine.TEST_MESSAGE, TestTMessage);
     }
 
