@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using PoolModule;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class MessageManager : Singleton<MessageManager>, IDisposable
 {
-    private Dictionary<string, IMessageData> dictionaryMessage;
+    private Dictionary<string, MessageDataBase> dictionaryMessage;
     private Dictionary<string, List<Action>> _delayExecuteActions = new Dictionary<string, List<Action>>();
+    private const int MaxLoopCount = 10;
     public MessageManager()
     {
         InitData();
@@ -15,22 +17,22 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
 
     private void InitData()
     {
-        dictionaryMessage = new Dictionary<string, IMessageData>();
+        dictionaryMessage = new Dictionary<string, MessageDataBase>();
     }
 
-    public void Register<T>(string key, UnityAction<T> action)
+    public void Register<T>(string key, UnityAction<T> action, int priority)
     {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
             if (previousAction is MessageData<T> messageData)
             {
                 if (!messageData.HasDispatching)
-                    messageData.MessageEvents += action;
+                    messageData.AddMessageAction(action, priority);
                 else
                 {
                     void RegisterAction()
                     {
-                        Register(key, action);
+                        Register(key, action, priority);
                     }
 
                     AddDelayExecuteAction(key, RegisterAction);
@@ -39,11 +41,14 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
         }
         else
         {
-            // dictionaryMessage.Add(key, new MessageData<T>(action));
             var messageData = ObjectPoolFactory.Instance.GetItem<MessageData<T>>();
-            messageData.MessageEvents += action;
+            messageData.AddMessageAction(action, priority);
             dictionaryMessage.Add(key, messageData);
         }
+    }
+    public void Register<T>(string key, UnityAction<T> action)
+    {
+        Register(key, action, MessageDispatchPriority.UI);
     }
 
     public void Remove<T>(string key, UnityAction<T> action)
@@ -54,9 +59,9 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             {
                 if(!messageData.HasDispatching)
                 {
-                    if(messageData.MessageEvents != null)
-                        messageData.MessageEvents -= action;
-                    if (messageData.MessageEvents == null)
+                    if(messageData.NotEmpty())
+                        messageData.RemoveMessageAction(action);
+                    if (!messageData.NotEmpty())
                     {
                         dictionaryMessage.Remove(key);
                         ObjectPoolFactory.Instance.RecycleItem(messageData);
@@ -93,8 +98,6 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
     {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
-            // (previousAction as MessageData<T>)?.MessageEvents.Invoke(data);
-            
             if(previousAction is MessageData<T> messageData)
             {
                 if (messageData.HasDispatching)
@@ -105,42 +108,34 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                     }
 
                     AddDelayExecuteAction(key, DispatchAction);
-
                     return;
                 }
                 
                 messageData.HasDispatching = true;
-                var invocationList = messageData.MessageEvents.GetInvocationList();
-                foreach (var item in invocationList)
+                messageData.DispatchLoopCount++;
+                if(messageData.NotEmpty())
                 {
-                    if (item is UnityAction<T> action)
-                    {
-                        try
-                        {
-                            action.Invoke(data);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                        
-                    }
+                    if (messageData.DispatchLoopCount < MaxLoopCount)
+                        messageData.Dispatch(data);
+                    else
+                        Debug.LogError("MessageManager Send LoopCount > MaxLoopCount");
                 }
                 messageData.HasDispatching = false;
                 //如果key有对应未处理的延时执行的action，则执行
                 TryExecuteDelayAction(key);
+                messageData.DispatchLoopCount = 0;
             }
         }
     }
 
-    public void Register(string key, UnityAction action)
+    public void Register(string key, UnityAction action, int priority = 0)
     {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
             if (previousAction is MessageData messageData)
             {
                 if(!messageData.HasDispatching)
-                    messageData.MessageEvents += action;
+                    messageData.AddMessageAction(action, priority);
                 else
                 {
                     void RegisterAction()
@@ -157,9 +152,14 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             // dictionaryMessage.Add(key, new MessageData(action));
             //池化
             var messageData = ObjectPoolFactory.Instance.GetItem<MessageData>();
-            messageData.MessageEvents += action;
+            messageData.AddMessageAction(action, priority);
             dictionaryMessage.Add(key, messageData);
         }
+    }
+    
+    public void Register(string key, UnityAction action)
+    {
+        Register(key, action, MessageDispatchPriority.UI);
     }
 
     public void Remove(string key, UnityAction action)
@@ -170,9 +170,9 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             {
                 if(!messageData.HasDispatching)
                 {
-                    if(messageData.MessageEvents != null)
-                        messageData.MessageEvents -= action;
-                    if(messageData.MessageEvents == null)
+                    if(messageData.NotEmpty())
+                        messageData.RemoveMessageAction(action);
+                    if (!messageData.NotEmpty())
                     {
                         dictionaryMessage.Remove(key);
                         ObjectPoolFactory.Instance.RecycleItem(messageData);
@@ -212,39 +212,34 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
     {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
-            // (previousAction as MessageData)?.MessageEvents.Invoke();
             if (previousAction is MessageData messageData)
             {
                 if (messageData.HasDispatching)
                 {
+                    void DispatchAction()
+                    {
+                        Send(key);
+                    }
                     
+                    AddDelayExecuteAction(key, DispatchAction);
                     return;
                 }
                 //设置派发标记位
                 messageData.HasDispatching = true;
-                if(messageData.MessageEvents != null)
+                messageData.DispatchLoopCount++;
+                if(messageData.NotEmpty())
                 {
-                    var invocationList = messageData.MessageEvents.GetInvocationList();
-                    foreach (var item in invocationList)
-                    {
-                        if (item is UnityAction action)
-                        {
-                            try
-                            {
-                                action.Invoke();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
-
-                        }
-                    }
+                    //小于等于最大派发次数，执行派发
+                    if(messageData.DispatchLoopCount <= MaxLoopCount)
+                        messageData.Dispatch();
+                    else
+                        Debug.LogError("MessageManager Send LoopCount > MaxLoopCount");
                 }
                 //派发完毕，清除标记位
                 messageData.HasDispatching = false;
                 //如果key有对应未处理的延时执行的action，则执行
                 TryExecuteDelayAction(key);
+                messageData.DispatchLoopCount = 0;
             }
         }
     }
