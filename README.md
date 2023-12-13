@@ -15,6 +15,8 @@
 
 [Unity基础框架从0到1（七）音频管理模块](https://mp.weixin.qq.com/s/qlY-GwSWZNXA2dI6QzMLCA)
 
+[Unity基础框架从0到1（八）UI框架](https://mp.weixin.qq.com/s/utx9i56QWi-MtnfFyAnWmw)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
 
