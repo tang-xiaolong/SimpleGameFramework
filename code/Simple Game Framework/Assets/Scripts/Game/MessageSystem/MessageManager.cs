@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using PoolModule;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class MessageManager : Singleton<MessageManager>, IDisposable
 {
+    class MessageTagData
+    {
+        public string MessageTag;
+        public Type DataType;
+    }
     private Dictionary<string, MessageDataBase> dictionaryMessage;
     private Dictionary<string, List<Action>> _delayExecuteActions = new Dictionary<string, List<Action>>();
+    public static bool NeedRecheckMsgTag = false;
+    private Dictionary<string, string> _messageTagDic = new Dictionary<string, string>();
     private const int MaxLoopCount = 10;
     public MessageManager()
     {
@@ -22,12 +28,36 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
 
     public void Register<T>(string key, UnityAction<T> action, int priority)
     {
+        Register(key, action, priority, string.Empty);
+    }
+    
+    void TryAddMessageTag(string key, string messageTag)
+    {
+        if (string.IsNullOrEmpty(messageTag))
+            return;
+        if (_messageTagDic.TryGetValue(key, out var oldTag))
+        {
+            if(NeedRecheckMsgTag && oldTag != messageTag)
+                Debug.LogError(
+                    $"MessageManager TryAddMessageTag oldTag != messageTag, oldTag:{oldTag}, messageTag:{messageTag}");
+        }
+        else
+        {
+            _messageTagDic.Add(key, messageTag);
+        }
+    }
+    
+    public void Register<T>(string key, UnityAction<T> action, int priority, string messageTag)
+    {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
             if (previousAction is MessageData<T> messageData)
             {
                 if (!messageData.HasDispatching)
+                {
                     messageData.AddMessageAction(action, priority);
+                    TryAddMessageTag(key, messageTag);
+                }
                 else
                 {
                     void RegisterAction()
@@ -43,12 +73,17 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
         {
             var messageData = ObjectPoolFactory.Instance.GetItem<MessageData<T>>();
             messageData.AddMessageAction(action, priority);
+            TryAddMessageTag(key, messageTag);
             dictionaryMessage.Add(key, messageData);
         }
     }
     public void Register<T>(string key, UnityAction<T> action)
     {
         Register(key, action, MessageDispatchPriority.UI);
+    }
+    public void Register<T>(string key, UnityAction<T> action, string messageTag)
+    {
+        Register(key, action, MessageDispatchPriority.UI, messageTag);
     }
 
     public void Remove<T>(string key, UnityAction<T> action)
@@ -64,6 +99,8 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                     if (!messageData.NotEmpty())
                     {
                         dictionaryMessage.Remove(key);
+                        if(_messageTagDic.ContainsKey(key))
+                            _messageTagDic.Remove(key);
                         ObjectPoolFactory.Instance.RecycleItem(messageData);
                     }
                 }
@@ -128,14 +165,27 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
         }
     }
 
-    public void Register(string key, UnityAction action, int priority = 0)
+    public void Register(string key, UnityAction action, int priority)
+    {
+        Register(key, action, priority, string.Empty);
+    }
+    
+    public void Register(string key, UnityAction action, string messageTag)
+    {
+        Register(key, action, MessageDispatchPriority.UI, messageTag);
+    }
+    
+    public void Register(string key, UnityAction action, int priority, string messageTag)
     {
         if (dictionaryMessage.TryGetValue(key, out var previousAction))
         {
             if (previousAction is MessageData messageData)
             {
                 if(!messageData.HasDispatching)
+                {
                     messageData.AddMessageAction(action, priority);
+                    TryAddMessageTag(key, messageTag);
+                }
                 else
                 {
                     void RegisterAction()
@@ -153,6 +203,7 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             //池化
             var messageData = ObjectPoolFactory.Instance.GetItem<MessageData>();
             messageData.AddMessageAction(action, priority);
+            TryAddMessageTag(key, messageTag);
             dictionaryMessage.Add(key, messageData);
         }
     }
@@ -175,6 +226,8 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                     if (!messageData.NotEmpty())
                     {
                         dictionaryMessage.Remove(key);
+                        if(_messageTagDic.ContainsKey(key))
+                            _messageTagDic.Remove(key);
                         ObjectPoolFactory.Instance.RecycleItem(messageData);
                     }
                 }
@@ -189,6 +242,27 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                 }
             }
         }
+    }
+    
+    public void RemoveMessageByTag(string messageTag)
+    {
+        List<string> keys = ObjectPoolFactory.Instance.GetItem<List<string>>();
+        foreach (var item in _messageTagDic)
+        {
+            if (item.Value == messageTag)
+            {
+                keys.Add(item.Key);
+            }
+        }
+
+        foreach (var key in keys)
+        {
+            if (dictionaryMessage.TryGetValue(key, out var previousAction))
+            {
+                previousAction.InjectRemove(this, key);
+            }
+        }
+        ObjectPoolFactory.Instance.RecycleItem(keys);
     }
 
     //尝试将某个key对应的延时执行的action执行掉

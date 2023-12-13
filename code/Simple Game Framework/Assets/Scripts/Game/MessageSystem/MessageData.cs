@@ -17,6 +17,8 @@ public abstract class MessageDataBase : IPoolObjectItem
 
     public abstract bool NotEmpty();
 
+    public abstract void InjectRemove(MessageManager messageManager, string key);
+
     public void OnRecycleHandle()
     {
         BeRecycleHandle();
@@ -90,6 +92,20 @@ public class MessageData<T> : MessageDataBase
     public override bool NotEmpty()
     {
         return _messageQueue != null && _messageQueue.Count > 0;
+    }
+
+    public override void InjectRemove(MessageManager messageManager, string key)
+    {
+        if(NotEmpty())
+        {
+            var tempQueue = ObjectPoolFactory.Instance.GetItem<List<MessageDataBody<T>>>();
+            tempQueue.AddRange(_messageQueue);
+            foreach (MessageDataBody<T> messageDataBody in tempQueue)
+            {
+                messageManager.Remove(key, messageDataBody.MessageEvents);
+            }
+            ObjectPoolFactory.Instance.RecycleItem(tempQueue);
+        }
     }
 
     protected override void BeGetHandle()
@@ -192,6 +208,20 @@ public class MessageData : MessageDataBase
     public override bool NotEmpty()
     {
         return _messageQueue != null && _messageQueue.Count > 0;
+    }
+
+    public override void InjectRemove(MessageManager messageManager, string key)
+    {
+        if(NotEmpty())
+        {
+            var tempQueue = ObjectPoolFactory.Instance.GetItem<List<MessageDataBody>>();
+            tempQueue.AddRange(_messageQueue);
+            foreach (MessageDataBody messageDataBody in tempQueue)
+            {
+                messageManager.Remove(key, messageDataBody.MessageEvents);
+            }
+            ObjectPoolFactory.Instance.RecycleItem(tempQueue);
+        }
     }
 
     protected override void BeGetHandle()

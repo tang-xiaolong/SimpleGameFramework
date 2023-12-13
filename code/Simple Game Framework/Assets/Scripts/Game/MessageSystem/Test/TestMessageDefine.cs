@@ -8,5 +8,7 @@
         public static string LoopDispatch1 = "LoopDispatch1";
         public static string MultipleLoopDispatch1 = "MultipleLoopDispatch1";
         public static string MultipleLoopDispatch2 = "MultipleLoopDispatch2";
+        public static string MessageTag1 = "MessageTag1";
+        public static string MessageTag2 = "MessageTag2";
     }
 }
