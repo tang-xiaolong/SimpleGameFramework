@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PoolModule;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -9,6 +10,8 @@ public class UIManager : Singleton<UIManager>
     private List<UIStackCeil> _uiStack = new List<UIStackCeil>();
     private Dictionary<string, int> _panelRefDic = new Dictionary<string, int>(); 
     private Dictionary<string, UIBasePanel> _panelDic = new Dictionary<string, UIBasePanel>();
+    private Dictionary<string, (string, GameObject)> _waitDestroyPanelDic = new Dictionary<string, (string, GameObject)>();
+    private const float WaitDestroyTime = 3f;
     public Action OnStackInfoRefresh;
     private Transform _canvasTransform;
     private Transform GetCanvasTransform()
@@ -184,7 +187,17 @@ public class UIManager : Singleton<UIManager>
                 ObjectPoolFactory.Instance.RecycleItem(stackCeil);
                 if (refCount <= 0)
                 {
-                    UnityObjectPoolFactory.Instance.RecycleItem(GetUIPathByUIName(uiName), _panelDic[uiName].gameObject);
+                    // UnityObjectPoolFactory.Instance.RecycleItem(GetUIPathByUIName(uiName), _panelDic[uiName].gameObject);
+                    GameObject objPanel = _panelDic[uiName].gameObject;
+                    string token = DelayedTaskModule.DelayedTaskScheduler.Instance.AddDelayedTask(
+                        DelayedTaskModule.TimerUtil.GetLaterMilliSecondsBySecond(WaitDestroyTime),
+                        () =>
+                        {
+                            _waitDestroyPanelDic.Remove(uiName);
+                            Object.Destroy(objPanel);
+                        });
+                    _waitDestroyPanelDic.Add(uiName, (token, objPanel));
+                    objPanel.SetActive(false);
                     _panelDic.Remove(uiName);
                 }
                 break;
@@ -215,7 +228,22 @@ public class UIManager : Singleton<UIManager>
     {
         if (_panelDic.TryGetValue(uiName, out var panel))
             return panel;
-        GameObject objPanel = UnityObjectPoolFactory.Instance.GetItem<GameObject>(GetUIPathByUIName(uiName));
+        // GameObject objPanel = UnityObjectPoolFactory.Instance.GetItem<GameObject>(GetUIPathByUIName(uiName));
+        GameObject objPanel = null;
+        if (_waitDestroyPanelDic.TryGetValue(uiName, out (string, GameObject) tuple))
+        {
+            _waitDestroyPanelDic.Remove(uiName);
+            DelayedTaskModule.DelayedTaskScheduler.Instance.RemoveDelayedTask(tuple.Item1);
+            objPanel = tuple.Item2;
+        }
+        else
+        {
+            GameObject panelPrefab = GameManager.Instance.AssetLoad.LoadAsset<GameObject>(GetUIPathByUIName(uiName));
+            if (panelPrefab != null)
+            {
+                objPanel = Object.Instantiate(panelPrefab);
+            }
+        }
         if (objPanel == null)
         {
             Debug.LogError("Load Panel Error: " + uiName);
