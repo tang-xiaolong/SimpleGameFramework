@@ -11,7 +11,7 @@ public class UIManager : Singleton<UIManager>
     private Dictionary<string, int> _panelRefDic = new Dictionary<string, int>(); 
     private Dictionary<string, UIBasePanel> _panelDic = new Dictionary<string, UIBasePanel>();
     private Dictionary<string, (string, GameObject)> _waitDestroyPanelDic = new Dictionary<string, (string, GameObject)>();
-    private const float WaitDestroyTime = 3f;
+    private const float WaitDestroyTime = 20f;
     public Action OnStackInfoRefresh;
     private Transform _canvasTransform;
     private Transform GetCanvasTransform()
