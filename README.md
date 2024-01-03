@@ -17,6 +17,8 @@
 
 [Unity基础框架从0到1（八）UI框架](https://mp.weixin.qq.com/s/utx9i56QWi-MtnfFyAnWmw)
 
+[Unity基础框架从0到1（九）全局消息系统优化](https://mp.weixin.qq.com/s/SSNzxNkg2ZBmi5GsF2GPag)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
 
