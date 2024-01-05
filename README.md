@@ -19,6 +19,8 @@
 
 [Unity基础框架从0到1（九）全局消息系统优化](https://mp.weixin.qq.com/s/SSNzxNkg2ZBmi5GsF2GPag)
 
+[Unity基础框架从0到1（十）UI框架勘误](https://mp.weixin.qq.com/s/gFzb5hJbacvBQ8912DLUhQ)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
 
@@ -33,3 +35,5 @@
 [Unity基础框架从0到1（六）对象池模块](https://www.bilibili.com/video/BV1rk4y1H7uq)
 
 [Unity游戏框架从0到1 (七)音频管理模块](https://www.bilibili.com/video/BV1MG411Q7KP/?)
+
+[Unity游戏框架从0到1 (八)UI框架](https://www.bilibili.com/video/BV1tT4y1H7mg/?)
