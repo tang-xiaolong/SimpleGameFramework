@@ -37,3 +37,13 @@
 [Unity游戏框架从0到1 (七)音频管理模块](https://www.bilibili.com/video/BV1MG411Q7KP/?)
 
 [Unity游戏框架从0到1 (八)UI框架](https://www.bilibili.com/video/BV1tT4y1H7mg/?)
+
+
+
+## 联系我
+
+B站：我可是唐小龙啊 [链接](https://space.bilibili.com/247272419?)
+
+微信公众号：小龙的游戏编程笔记
+
+![qrcode_for_gh_2cef0d0f3c58_258](https://img-bucket11.oss-cn-hangzhou.aliyuncs.com/BlogImage/20240109125445.jpg)
