@@ -21,6 +21,8 @@
 
 [Unity基础框架从0到1（十）UI框架勘误](https://mp.weixin.qq.com/s/gFzb5hJbacvBQ8912DLUhQ)
 
+[Unity基础框架从0到1（十一）存储模块第一部分：(反)序列化](https://mp.weixin.qq.com/s/WbdRjaQ4iZ1LDBoFLOkPfg)
+
 ### 视频
  [Unity基础框架从0到1 开篇](https://www.bilibili.com/video/BV1Av411Y7VH)
 
