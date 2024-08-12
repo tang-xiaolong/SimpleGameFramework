@@ -60,12 +60,17 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                 }
                 else
                 {
-                    void RegisterAction()
+                    RegisterActionData<T> registerActionData = ObjectPoolFactory.Instance.GetItem<RegisterActionData<T>>();
+                    registerActionData.Key = key;
+                    registerActionData.Action = action;
+                    registerActionData.Priority = priority;
+                    registerActionData.MessageTag = messageTag;
+                    void WrappedAction()
                     {
-                        Register(key, action, priority);
+                        RegisterWithActionData(registerActionData);
+                        ObjectPoolFactory.Instance.RecycleItem(registerActionData);
                     }
-
-                    AddDelayExecuteAction(key, RegisterAction);
+                    AddDelayExecuteAction(key, WrappedAction);
                 }
             }
         }
@@ -106,11 +111,14 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                 }
                 else
                 {
+                    RemoveActionData<T> removeActionData = ObjectPoolFactory.Instance.GetItem<RemoveActionData<T>>();
+                    removeActionData.Key = key;
+                    removeActionData.Action = action;
                     void RemoveAction()
                     {
-                        Remove(key, action);
+                        RemoveWithActionData(removeActionData);
+                        ObjectPoolFactory.Instance.RecycleItem(removeActionData);
                     }
-
                     AddDelayExecuteAction(key, RemoveAction);
                 }
             }
@@ -139,12 +147,17 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             {
                 if (messageData.HasDispatching)
                 {
-                    void DispatchAction()
+                    var actionData = ObjectPoolFactory.Instance.GetItem<SendActionData<T>>();// new SendActionData<T> { Key = key, Data = data };
+                    actionData.Key = key;
+                    actionData.Data = data;
+
+                    void WrappedAction()
                     {
-                        Send(key, data);
+                        SendWithActionData(actionData);
+                        ObjectPoolFactory.Instance.RecycleItem(actionData);
                     }
 
-                    AddDelayExecuteAction(key, DispatchAction);
+                    AddDelayExecuteAction(key,  WrappedAction);
                     return;
                 }
                 
@@ -188,9 +201,15 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                 }
                 else
                 {
+                    RegisterActionData registerActionData = ObjectPoolFactory.Instance.GetItem<RegisterActionData>();
+                    registerActionData.Key = key;
+                    registerActionData.Action = action;
+                    registerActionData.Priority = priority;
+                    registerActionData.MessageTag = messageTag;
                     void RegisterAction()
                     {
-                        Register(key, action);
+                        RegisterWithActionData(registerActionData);
+                        ObjectPoolFactory.Instance.RecycleItem(registerActionData);
                     }
 
                     AddDelayExecuteAction(key, RegisterAction);
@@ -233,9 +252,13 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
                 }
                 else
                 {
+                    RemoveActionData removeActionData = ObjectPoolFactory.Instance.GetItem<RemoveActionData>();
+                    removeActionData.Key = key;
+                    removeActionData.Action = action;
                     void RemoveAction()
                     {
-                        Remove(key, action);
+                        RemoveWithActionData(removeActionData);
+                        ObjectPoolFactory.Instance.RecycleItem(removeActionData);
                     }
 
                     AddDelayExecuteAction(key, RemoveAction);
@@ -290,9 +313,12 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             {
                 if (messageData.HasDispatching)
                 {
+                    var actionData = ObjectPoolFactory.Instance.GetItem<SendActionData>();
+                    actionData.Key = key;
                     void DispatchAction()
                     {
-                        Send(key);
+                        SendWithActionData(actionData);
+                        ObjectPoolFactory.Instance.RecycleItem(actionData);
                     }
                     
                     AddDelayExecuteAction(key, DispatchAction);
@@ -317,6 +343,70 @@ public class MessageManager : Singleton<MessageManager>, IDisposable
             }
         }
     }
+
+    #region DelayEvent相关处理
+    private struct SendActionData<T>
+    {
+        public string Key;
+        public T Data;
+    }
+    private struct SendActionData
+    {
+        public string Key;
+    }
+    struct RegisterActionData<T>
+    {
+        public string Key;
+        public UnityAction<T> Action;
+        public int Priority;
+        public string MessageTag;
+    }
+
+    struct RegisterActionData
+    {
+        public string Key;
+        public UnityAction Action;
+        public int Priority;
+        public string MessageTag;
+    }
+
+    struct RemoveActionData<T>
+    {
+        public string Key;
+        public UnityAction<T> Action;
+    }
+    struct RemoveActionData
+    {
+        public string Key;
+        public UnityAction Action;
+    }
+    
+    private void SendWithActionData<T>(SendActionData<T> actionData)
+    {
+        Send(actionData.Key, actionData.Data);
+    }
+    private void SendWithActionData(SendActionData actionData)
+    {
+        Send(actionData.Key);
+    }
+    void RegisterWithActionData<T>(RegisterActionData<T> actionData)
+    {
+        Register(actionData.Key, actionData.Action, actionData.Priority, actionData.MessageTag);
+    }
+    void RegisterWithActionData(RegisterActionData actionData)
+    {
+        Register(actionData.Key, actionData.Action, actionData.Priority, actionData.MessageTag);
+    }
+    void RemoveWithActionData<T>(RemoveActionData<T> actionData)
+    {
+        Remove(actionData.Key, actionData.Action);
+    }
+    
+    void RemoveWithActionData(RemoveActionData actionData)
+    {
+        Remove(actionData.Key, actionData.Action);
+    }
+    #endregion
 
     public void Clear()
     {
